@@ -26,11 +26,45 @@ void APawnTank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	Rotate();
+	Move();
+
 }
 
 // Called to bind functionality to input
 void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
+	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotateInput);
+
+
+}
+
+void APawnTank::CalculateMoveInput(float Value)
+{
+	//Only moving on x axis 
+	MoveDirection = FVector(Value * MoveSpeed * GetWorld()->DeltaTimeSeconds, 0, 0);
+}
+
+void APawnTank::CalculateRotateInput(float Value)
+{
+	float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
+	FRotator Rotation = FRotator(0, RotateAmount, 0);
+	RotationDirection = FQuat(Rotation);
+
+}
+
+void APawnTank::Move()
+{
+	//Sweep option asks whether collision should be checked whether moving
+	//Set to true here
+	AddActorLocalOffset(MoveDirection, true);
+}
+
+void APawnTank::Rotate()
+{
+	//Set sweep option to true again to avoid weird glitches
+	AddActorLocalRotation(RotationDirection, true);
 
 }
