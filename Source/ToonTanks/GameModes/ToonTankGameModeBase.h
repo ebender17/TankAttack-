@@ -9,12 +9,18 @@
 /**
  * 
  */
+class APawnTank; 
+class APawnTurret;
 UCLASS()
 class TOONTANKS_API AToonTankGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
 private:
+	APawnTank* PlayerTank; 
+	int32 TargetTurrets = 0; 
+
+	int32 GetTargetTurretCount();
 	void HandleGameStart();
 	void HandleGameOver(bool PlayerWon);
 
