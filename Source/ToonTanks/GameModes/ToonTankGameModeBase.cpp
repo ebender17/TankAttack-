@@ -4,6 +4,7 @@
 #include "ToonTankGameModeBase.h"
 #include "ToonTanks/Pawn/PawnTank.h"
 #include "ToonTanks/Pawn/PawnTurret.h"
+#include "ToonTanks/PlayerControllers/PlayerControllerBase.h"
 #include "Kismet/GameplayStatics.h"
 
 void AToonTankGameModeBase::BeginPlay()
@@ -24,6 +25,11 @@ void AToonTankGameModeBase::ActorDied(AActor* DeadActor)
 	{
 		PlayerTank->HandleDestruction();
 		HandleGameOver(false); 
+
+		if (PlayerControllerRef)
+		{
+			PlayerControllerRef->SetPlayerEnabledState(false);
+		}
 	}
 	else if (APawnTurret* DestroyedTurret = Cast<APawnTurret>(DeadActor)) 
 	{
@@ -39,11 +45,19 @@ void AToonTankGameModeBase::HandleGameStart()
 {
 	//Initialize the start countdown, turret activation, pawn check etc. 
 	TargetTurrets = GetTargetTurretCount();
-
 	PlayerTank = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+	PlayerControllerRef = Cast<APlayerControllerBase>(UGameplayStatics::GetPlayerController(this, 0));
 
 	//Call Blueprint version GameStart()
 	GameStart();
+	if (PlayerControllerRef)
+	{
+		PlayerControllerRef->SetPlayerEnabledState(false);
+
+		FTimerHandle PlayerEnableHandle; 
+		FTimerDelegate PlayerEnableDelegate = FTimerDelegate::CreateUObject(PlayerControllerRef, &APlayerControllerBase::SetPlayerEnabledState, true);
+		GetWorld()->GetTimerManager().SetTimer(PlayerEnableHandle, PlayerEnableDelegate, StartDelay, false);
+	}
 }
 
 void AToonTankGameModeBase::HandleGameOver(bool PlayerWon) 
