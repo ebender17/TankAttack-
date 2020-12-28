@@ -50,6 +50,7 @@ void AToonTankGameModeBase::HandleGameStart()
 
 	//Call Blueprint version GameStart()
 	GameStart();
+
 	if (PlayerControllerRef)
 	{
 		PlayerControllerRef->SetPlayerEnabledState(false);
@@ -62,8 +63,6 @@ void AToonTankGameModeBase::HandleGameStart()
 
 void AToonTankGameModeBase::HandleGameOver(bool PlayerWon) 
 {
-	//See if the player has destroyed all the turrets, show win result. 
-	// else if turret destroyed player, show lose result. 
 	//Call blueprint version GameOver(bool)
 	GameOver(PlayerWon);
 
